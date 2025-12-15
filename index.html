@@ -5,19 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Smart Grocery</title>
 
-    <link rel="manifest" href='data:application/manifest+json;charset=utf-8,{"name":"Smart Grocery","short_name":"Grocery","start_url":".","display":"standalone","background_color":"#f8fafc","theme_color":"#2563eb","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 512 512%22%3E%3Cpath fill=%22%232563eb%22 d=%22M0 0h512v512H0z%22/%3E%3Cpath fill=%22%23fff%22 d=%22M133 133h246v246H133z%22/%3E%3Cpath fill=%22%232563eb%22 d=%22M150 250l70 70 150-150%22 stroke=%22%232563eb%22 stroke-width=%2240%22 fill=%22none%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/%3E%3C/svg%3E","sizes":"512x512","type":"image/svg+xml"}]}'>
-
+    <link rel="manifest" href='data:application/manifest+json;charset=utf-8,{"name":"Smart Grocery","short_name":"Grocery","start_url":".","display":"standalone","background_color":"#f8fafc","theme_color":"#10b981","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 512 512%22%3E%3Cpath fill=%22%2310b981%22 d=%22M0 0h512v512H0z%22/%3E%3Cpath fill=%22%23fff%22 d=%22M133 133h246v246H133z%22/%3E%3Cpath fill=%22%2310b981%22 d=%22M150 250l70 70 150-150%22 stroke=%22%2310b981%22 stroke-width=%2240%22 fill=%22none%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/%3E%3C/svg%3E","sizes":"512x512","type":"image/svg+xml"}]}'>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 512 512%22%3E%3Crect width=%22512%22 height=%22512%22 rx=%22100%22 ry=%22100%22 fill=%22%232563eb%22/%3E%3Cpath d=%22M150 250l70 70 150-150%22 stroke=%22%23ffffff%22 stroke-width=%2250%22 fill=%22none%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/%3E%3C/svg%3E'>
+    <link rel="apple-touch-icon" href='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 512 512%22%3E%3Crect width=%22512%22 height=%22512%22 rx=%22100%22 ry=%22100%22 fill=%22%2310b981%22/%3E%3Cpath d=%22M150 250l70 70 150-150%22 stroke=%22%23ffffff%22 stroke-width=%2250%22 fill=%22none%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/%3E%3C/svg%3E'>
 
     <style>
         :root {
-            --primary: #2563eb;
             --bg: #f8fafc;
-            --card: #ffffff;
             --text: #1e293b;
             --border: #e2e8f0;
+
+            /* Color Codes */
+            --buy-color: #10b981;  /* Green for To Buy */
+            --buy-bg: #ecfdf5;
+            --hist-color: #f59e0b; /* Orange for History */
+            --hist-bg: #fffbeb;
         }
 
         body {
@@ -25,25 +28,19 @@
             background-color: var(--bg);
             color: var(--text);
             margin: 0;
-            padding: 20px;
+            padding: 10px; /* Reduced padding for mobile */
             height: 100vh;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
-            /* Prevent pull-to-refresh on mobile which feels less "app-like" */
             overscroll-behavior-y: contain;
         }
 
-        h1 { margin-bottom: 20px; text-align: center; font-size: 1.5rem; user-select: none; }
-
-        /* Input Area */
+        /* Header & Input */
         .input-group {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
+            gap: 8px;
+            margin-bottom: 15px;
             width: 100%;
         }
 
@@ -53,52 +50,53 @@
             border: 1px solid var(--border);
             border-radius: 8px;
             font-size: 16px;
-            /* Better mobile input handling */
             -webkit-appearance: none;
         }
 
         button#add-btn {
-            padding: 12px 24px;
-            background-color: var(--primary);
+            padding: 12px 20px;
+            background-color: var(--text);
             color: white;
             border: none;
             border-radius: 8px;
-            cursor: pointer;
             font-weight: bold;
-            /* Better touch target */
-            min-width: 80px;
+            cursor: pointer;
         }
 
-        /* Columns Container */
+        /* COLUMNS LAYOUT
+           Fixed to row even on small screens
+        */
         .container {
             display: flex;
+            flex-direction: row; /* Force side by side */
             flex: 1;
-            gap: 20px;
-            max-width: 800px;
-            margin: 0 auto;
+            gap: 10px;
             width: 100%;
             overflow: hidden;
         }
 
         .column {
-            flex: 1;
-            background: var(--card);
+            flex: 1; /* Both take equal space */
+            background: #ffffff;
             border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             display: flex;
             flex-direction: column;
             border: 1px solid var(--border);
+            overflow: hidden;
         }
 
         .column-header {
-            padding: 15px;
-            background: #f1f5f9;
-            border-bottom: 1px solid var(--border);
+            padding: 12px 5px;
             font-weight: bold;
             text-align: center;
-            border-radius: 12px 12px 0 0;
-            user-select: none;
+            font-size: 0.95rem;
+            color: white;
         }
+
+        /* Color Coding Headers */
+        #col-tobuy .column-header { background-color: var(--buy-color); }
+        #col-history .column-header { background-color: var(--hist-color); }
 
         .list {
             list-style: none;
@@ -106,51 +104,42 @@
             margin: 0;
             overflow-y: auto;
             flex: 1;
-            /* Smooth scrolling on iOS */
             -webkit-overflow-scrolling: touch;
         }
 
         .list-item {
-            padding: 15px; /* Larger touch target */
+            padding: 12px 10px;
             border-bottom: 1px solid var(--border);
             cursor: pointer;
-            transition: background 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 1.1rem; /* Slightly larger text for mobile */
-            user-select: none;
+            font-size: 1rem; /* Readable on mobile */
+            word-break: break-word; /* Prevent long words breaking layout */
+            line-height: 1.3;
         }
 
-        .list-item:active {
-            background-color: #e2e8f0; /* Touch feedback */
+        /* --- TO BUY STYLES --- */
+        #tobuy-list .list-item {
+            background-color: var(--buy-bg);
+            color: #064e3b;
+        }
+        #tobuy-list .list-item:active { background-color: #d1fae5; }
+
+        /* --- HISTORY STYLES --- */
+        #history-list .list-item {
+            background-color: #ffffff;
         }
 
-        #tobuy-list .list-item { background-color: #eff6ff; }
-        #tobuy-list .list-item::after {
-            content: '✓';
-            color: var(--primary);
-            font-weight: bold;
-            opacity: 0;
-        }
-        #tobuy-list .list-item:hover::after { opacity: 1; }
-
-        #history-list .list-item { opacity: 0.8; }
+        /* The "Already in cart" state */
         #history-list .list-item.is-in-cart {
-            opacity: 0.4;
-            text-decoration: line-through;
+            opacity: 0.5;
+            font-style: italic; /* CHANGED: Italic instead of strikethrough */
+            text-decoration: none; /* Removed strikethrough */
+            background-color: #f9fafb;
             pointer-events: none;
         }
 
-        @media (max-width: 600px) {
-            .container { flex-direction: column; }
-            .column { max-height: 50%; }
-        }
     </style>
 </head>
 <body>
-
-<h1>Groceries</h1>
 
 <div class="input-group">
     <input type="text" id="item-input" placeholder="Add item..." autocomplete="off" onkeypress="handleEnter(event)">
@@ -158,19 +147,19 @@
 </div>
 
 <div class="container">
-    <div class="column">
+    <div class="column" id="col-tobuy">
         <div class="column-header">To Buy</div>
         <ul id="tobuy-list" class="list"></ul>
     </div>
 
-    <div class="column">
+    <div class="column" id="col-history">
         <div class="column-header">History</div>
         <ul id="history-list" class="list"></ul>
     </div>
 </div>
 
 <script>
-    // Data Management
+    // Data
     let historyItems = [];
     let toBuyItems = [];
 
@@ -222,7 +211,7 @@
         if (e.key === 'Enter') addItem();
     }
 
-    // Rendering
+    // Render
     function render() {
         const toBuyListEl = document.getElementById('tobuy-list');
         const historyListEl = document.getElementById('history-list');
@@ -230,6 +219,7 @@
         toBuyListEl.innerHTML = '';
         historyListEl.innerHTML = '';
 
+        // Render To Buy
         toBuyItems.forEach(item => {
             const li = document.createElement('li');
             li.className = 'list-item';
@@ -238,15 +228,15 @@
             toBuyListEl.appendChild(li);
         });
 
+        // Render History (Alphabetical)
         const sortedHistory = [...historyItems].sort((a, b) => a.localeCompare(b));
 
         sortedHistory.forEach(item => {
             const li = document.createElement('li');
             li.textContent = item;
-            const isInToBuy = toBuyItems.includes(item);
 
-            if (isInToBuy) {
-                li.className = 'list-item is-in-cart';
+            if (toBuyItems.includes(item)) {
+                li.className = 'list-item is-in-cart'; // Applies opacity & italics
             } else {
                 li.className = 'list-item';
                 li.onclick = () => addToToBuy(item);
